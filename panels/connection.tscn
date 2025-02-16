@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=3 uid="uid://b332iq48kll48"]
+
+[ext_resource type="Script" path="res://panels/connection.gd" id="1_pkkaw"]
+
+[node name="connection" type="PanelContainer"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 31.0
+grow_horizontal = 2
+script = ExtResource("1_pkkaw")
+
+[node name="hb" type="HBoxContainer" parent="."]
+layout_mode = 2
+alignment = 1
+
+[node name="url_input" type="LineEdit" parent="hb"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+text = "ws://127.0.0.1:12345"
+placeholder_text = "Websocket URL..."
+
+[node name="connect_btn" type="Button" parent="hb"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Connect"
+
+[node name="disconnect_btn" type="Button" parent="hb"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Disconnect"
+
+[connection signal="pressed" from="hb/connect_btn" to="." method="_on_connect_btn_pressed"]
+[connection signal="pressed" from="hb/disconnect_btn" to="." method="_on_disconnect_btn_pressed"]

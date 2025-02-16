@@ -1,0 +1,59 @@
+[gd_scene load_steps=6 format=3 uid="uid://dcaw7l5ord5qc"]
+
+[ext_resource type="PackedScene" uid="uid://b332iq48kll48" path="res://panels/connection.tscn" id="1_4b6xj"]
+[ext_resource type="PackedScene" uid="uid://bxl6qxwhms6ym" path="res://panels/device_list.tscn" id="1_ngacf"]
+[ext_resource type="Script" path="res://controller.gd" id="1_vtwsa"]
+[ext_resource type="Script" path="res://addons/buttplugio/client.gd" id="2_n7541"]
+[ext_resource type="PackedScene" uid="uid://jf1vfbt24kkk" path="res://panels/device_info.tscn" id="2_oiqb8"]
+
+[node name="controller" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+script = ExtResource("1_vtwsa")
+
+[node name="client" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_n7541")
+
+[node name="vb" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="connection" parent="vb" instance=ExtResource("1_4b6xj")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="status" type="Label" parent="vb"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Disconnected"
+horizontal_alignment = 1
+
+[node name="hs" type="HSplitContainer" parent="vb"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+split_offset = 380
+
+[node name="device_list" parent="vb/hs" instance=ExtResource("1_ngacf")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="device_info" parent="vb/hs" instance=ExtResource("2_oiqb8")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[connection signal="connected" from="client" to="." method="_on_client_connected"]
+[connection signal="connection_failed" from="client" to="." method="_on_client_connection_failed"]
+[connection signal="device_connected" from="client" to="." method="_on_client_device_connected"]
+[connection signal="device_disconnected" from="client" to="." method="_on_client_device_disconnected"]
+[connection signal="disconnected" from="client" to="." method="_on_client_disconnected"]
+[connection signal="connection_requested" from="vb/connection" to="." method="_on_connection_connection_requested"]
+[connection signal="disconnect_requested" from="vb/connection" to="." method="_on_connection_disconnect_requested"]
+[connection signal="device_selected" from="vb/hs/device_list" to="." method="_on_device_list_device_selected"]

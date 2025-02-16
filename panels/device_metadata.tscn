@@ -1,0 +1,94 @@
+[gd_scene load_steps=2 format=3 uid="uid://orpiati8bhv"]
+
+[ext_resource type="Script" path="res://panels/device_metadata.gd" id="1_h5hhq"]
+
+[node name="device_metadata" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_h5hhq")
+
+[node name="vb" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="title" type="Label" parent="vb"]
+layout_mode = 2
+text = "Informations"
+
+[node name="GridContainer" type="GridContainer" parent="vb"]
+layout_mode = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 2
+
+[node name="name_label" type="Label" parent="vb/GridContainer"]
+layout_mode = 2
+text = "Name : "
+
+[node name="name_value" type="LineEdit" parent="vb/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="display_name_label" type="Label" parent="vb/GridContainer"]
+layout_mode = 2
+text = "Display name :"
+
+[node name="display_name_value" type="LineEdit" parent="vb/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="device_index_label" type="Label" parent="vb/GridContainer"]
+layout_mode = 2
+text = "Device Index :"
+
+[node name="device_index_value" type="LineEdit" parent="vb/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="scalar_label" type="Label" parent="vb/GridContainer"]
+layout_mode = 2
+text = "Scalar actuators :"
+
+[node name="scalar_value" type="LineEdit" parent="vb/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="linear_label" type="Label" parent="vb/GridContainer"]
+layout_mode = 2
+text = "Linear actuators :"
+
+[node name="linear_value" type="LineEdit" parent="vb/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="rotation_label" type="Label" parent="vb/GridContainer"]
+layout_mode = 2
+text = "Rotation actuators :"
+
+[node name="rotation_value" type="LineEdit" parent="vb/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="sensors_label" type="Label" parent="vb/GridContainer"]
+layout_mode = 2
+text = "Sensors :"
+
+[node name="sensors_value" type="LineEdit" parent="vb/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false

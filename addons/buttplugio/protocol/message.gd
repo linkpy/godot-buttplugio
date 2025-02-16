@@ -1,3 +1,7 @@
+## Class containing the Buttplug.IO protocol's messages.
+##
+class_name BPIOMessages
+
 
 class Base extends RefCounted:
 	var id: int = 0
@@ -140,7 +144,7 @@ class MessageSensorReading extends InboundMessage:
 	var device_index: int = 0
 	var sensor_index: int = 0
 	var sensor_type: String = ""
-	var data: Array[int] = []
+	var data: Array = []
 
 	func get_message_name() -> String:
 		return "SensorReading"
@@ -150,7 +154,7 @@ class MessageSensorReading extends InboundMessage:
 		device_index = dict["DeviceIndex"] as int
 		sensor_index = dict["SensorIndex"] as int
 		sensor_type = dict["SensorType"] as String
-		data = dict["Data"] as Array[int]
+		data = dict["Data"] as Array
 
 
 

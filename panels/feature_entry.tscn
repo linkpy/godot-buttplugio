@@ -1,0 +1,180 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbht2wpkf3tdv"]
+
+[ext_resource type="Script" path="res://panels/feature_entry.gd" id="1_3warc"]
+
+[node name="feature_entry" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+script = ExtResource("1_3warc")
+
+[node name="vb" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="gc" type="GridContainer" parent="vb"]
+layout_mode = 2
+columns = 2
+
+[node name="kind_label" type="Label" parent="vb/gc"]
+layout_mode = 2
+text = "Feature Kind :"
+
+[node name="kind" type="LineEdit" parent="vb/gc"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="descriptor_label" type="Label" parent="vb/gc"]
+layout_mode = 2
+text = "Descriptor :"
+
+[node name="descriptor" type="LineEdit" parent="vb/gc"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="step_count_label" type="Label" parent="vb/gc"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Step count :"
+
+[node name="step_count" type="LineEdit" parent="vb/gc"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="actuator_type_label" type="Label" parent="vb/gc"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Actuator type :"
+
+[node name="actuator_type" type="LineEdit" parent="vb/gc"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="sensor_type_label" type="Label" parent="vb/gc"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Sensor type :"
+
+[node name="sensor_type" type="LineEdit" parent="vb/gc"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="sensor_range_label" type="Label" parent="vb/gc"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Sensor range :"
+
+[node name="sensor_range" type="LineEdit" parent="vb/gc"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="scalar_controls" type="HBoxContainer" parent="vb"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="vb" type="VBoxContainer" parent="vb/scalar_controls"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="scalar_slider" type="HSlider" parent="vb/scalar_controls/vb"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="scalar_value" type="SpinBox" parent="vb/scalar_controls"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="vector_controls" type="HBoxContainer" parent="vb"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="vb" type="VBoxContainer" parent="vb/vector_controls"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="vector_position" type="HSlider" parent="vb/vector_controls/vb"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="vector_duration" type="SpinBox" parent="vb/vector_controls"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 10000.0
+suffix = "ms"
+
+[node name="rotation_controls" type="HBoxContainer" parent="vb"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="vb" type="VBoxContainer" parent="vb/rotation_controls"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="rotation_speed" type="HSlider" parent="vb/rotation_controls/vb"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="rotation_clockwise" type="CheckBox" parent="vb/rotation_controls"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Clockwise"
+
+[node name="sensor_controls" type="HBoxContainer" parent="vb"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="label" type="Label" parent="vb/sensor_controls"]
+layout_mode = 2
+text = "Sensor data :"
+
+[node name="sensor_data" type="LineEdit" parent="vb/sensor_controls"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="sensor_read" type="Button" parent="vb/sensor_controls"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Read"
+
+[connection signal="value_changed" from="vb/scalar_controls/vb/scalar_slider" to="." method="_on_scalar_slider_value_changed"]
+[connection signal="value_changed" from="vb/scalar_controls/scalar_value" to="." method="_on_scalar_value_value_changed"]
+[connection signal="value_changed" from="vb/vector_controls/vb/vector_position" to="." method="_on_vector_position_value_changed"]
+[connection signal="value_changed" from="vb/vector_controls/vector_duration" to="." method="_on_vector_duration_value_changed"]
+[connection signal="value_changed" from="vb/rotation_controls/vb/rotation_speed" to="." method="_on_rotation_speed_value_changed"]
+[connection signal="toggled" from="vb/rotation_controls/rotation_clockwise" to="." method="_on_rotation_clockwise_toggled"]
+[connection signal="pressed" from="vb/sensor_controls/sensor_read" to="." method="_on_sensor_read_pressed"]

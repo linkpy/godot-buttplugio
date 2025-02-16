@@ -1,7 +1,12 @@
+## Buttplug.IO connection to a server. Shouldnt be used directly (unless you 
+## know what you are doing).
+##
 class_name BPIOConnection extends RefCounted
 
-const BPIOMessage = preload("res://addons/buttplugio/protocol/message.gd")
+## Protocol version of the connection.
 const MESSAGE_VERSION := 3
+
+const _Messages = preload("res://addons/buttplugio/protocol/message.gd")
 
 signal connection_requested(url: String)
 signal disconnected_requested()
@@ -9,15 +14,15 @@ signal connected()
 signal disconnected()
 signal connection_failed(code: int, reason: String)
 
-signal message_received(msg: BPIOMessage.InboundMessage)
-signal message_ok_received(msg: BPIOMessage.MessageOk)
-signal message_error_received(msg: BPIOMessage.MessageError)
-signal message_server_info_received(msg: BPIOMessage.MessageServerInfo)
-signal message_scanning_finished_received(msg: BPIOMessage.MessageScanningFinished)
-signal message_device_list_received(msg: BPIOMessage.MessageDeviceList)
-signal message_device_added_received(msg: BPIOMessage.MessageDeviceAdded)
-signal message_device_removed_received(msg: BPIOMessage.MessageDeviceRemoved)
-signal message_sensor_reading_received(msg: BPIOMessage.MessageSensorReading)
+signal message_received(msg: _Messages.InboundMessage)
+signal message_ok_received(msg: _Messages.MessageOk)
+signal message_error_received(msg: _Messages.MessageError)
+signal message_server_info_received(msg: _Messages.MessageServerInfo)
+signal message_scanning_finished_received(msg: _Messages.MessageScanningFinished)
+signal message_device_list_received(msg: _Messages.MessageDeviceList)
+signal message_device_added_received(msg: _Messages.MessageDeviceAdded)
+signal message_device_removed_received(msg: _Messages.MessageDeviceRemoved)
+signal message_sensor_reading_received(msg: _Messages.MessageSensorReading)
 
 
 
@@ -123,6 +128,8 @@ func update_state() -> void:
                     print("[BPIO] Weird state: OPEN -> CLOSED")
         WebSocketPeer.STATE_CLOSING:
             match curr:
+                WebSocketPeer.STATE_CLOSING:
+                    _ws.poll() # needed to fullfil the disconnection
                 WebSocketPeer.STATE_CLOSED:
                     print("[BPIO] Disconnected from server.")
                     disconnected.emit()
@@ -149,10 +156,10 @@ func poll() -> void:
 
 
 
-func send_message(msg: BPIOMessage.OutboundMessage) -> void:
+func send_message(msg: _Messages.OutboundMessage) -> void:
     send_messages([msg])
 
-func send_messages(msgs: Array[BPIOMessage.OutboundMessage]) -> void:
+func send_messages(msgs: Array[_Messages.OutboundMessage]) -> void:
     for msg in msgs:
         if msg.id == 0:
             msg.id = _msg_id
@@ -184,7 +191,7 @@ func _parse_packets() -> void:
                 push_error("[BPIO] Invalid JSON object in packet.")
                 continue
             
-            var instance := BPIOMessage.InboundMessage.from_dict(content)
+            var instance := _Messages.InboundMessage.from_dict(content)
 
             if instance == null:
                 # error already printed by from_dict
@@ -192,36 +199,36 @@ func _parse_packets() -> void:
 
             _dispatch_message(instance)
 
-func _dispatch_message(msg: BPIOMessage.InboundMessage) -> void:
+func _dispatch_message(msg: _Messages.InboundMessage) -> void:
     message_received.emit(msg)
 
-    if msg is BPIOMessage.MessageOk:
+    if msg is _Messages.MessageOk:
         message_ok_received.emit(msg)
-    elif msg is BPIOMessage.MessageError:
+    elif msg is _Messages.MessageError:
         message_error_received.emit(msg)
-    elif msg is BPIOMessage.MessageServerInfo:
+    elif msg is _Messages.MessageServerInfo:
         _retreive_server_info(msg)
         message_server_info_received.emit(msg)
-    elif msg is BPIOMessage.MessageScanningFinished:
+    elif msg is _Messages.MessageScanningFinished:
         message_scanning_finished_received.emit(msg)
-    elif msg is BPIOMessage.MessageDeviceList:
+    elif msg is _Messages.MessageDeviceList:
         message_device_list_received.emit(msg)
-    elif msg is BPIOMessage.MessageDeviceAdded:
+    elif msg is _Messages.MessageDeviceAdded:
         message_device_added_received.emit(msg)
-    elif msg is BPIOMessage.MessageDeviceRemoved:
+    elif msg is _Messages.MessageDeviceRemoved:
         message_device_removed_received.emit(msg)    
-    elif msg is BPIOMessage.MessageSensorReading:
+    elif msg is _Messages.MessageSensorReading:
         message_sensor_reading_received.emit(msg)
 
 
 
 func _send_request_server_info() -> void:
-    var msg := BPIOMessage.MessageRequestServerInfo.new()
+    var msg := _Messages.MessageRequestServerInfo.new()
     msg.client_name = client_name
     msg.message_version = MESSAGE_VERSION
     send_message(msg)
 
-func _retreive_server_info(msg: BPIOMessage.MessageServerInfo) -> void:
+func _retreive_server_info(msg: _Messages.MessageServerInfo) -> void:
     _server_name = msg.server_name
     _message_version = msg.message_version
     _max_ping_time = msg.max_ping_time
@@ -242,5 +249,5 @@ func _send_ping_if_necessary() -> void:
     if (curr - last) < (_max_ping_time / 2):
         return
     
-    send_message(BPIOMessage.MessagePing.new())
+    send_message(_Messages.MessagePing.new())
     _last_ping_time = curr

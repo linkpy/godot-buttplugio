@@ -1,6 +1,8 @@
+## Client for Buttplug.IO. Internally uses [BPIOConnection].
+##
 class_name BPIOClient extends Node
 
-const BPIOMessage = preload("res://addons/buttplugio/protocol/message.gd")
+const _BPIOMessage = preload("res://addons/buttplugio/protocol/message.gd")
 
 
 
@@ -24,7 +26,7 @@ signal sensor_data_received(device: BPIODevice, sensor: int, data: Array[int])
 var _socket := BPIOConnection.new()
 
 var _devices: Dictionary = {}
-var _message_queue: Array[BPIOMessage.OutboundMessage] = []
+var _message_queue: Array[_BPIOMessage.OutboundMessage] = []
 
 
 
@@ -39,6 +41,11 @@ func is_client_disconnected() -> bool:
 
 func is_client_disconnecting() -> bool:
     return _socket.is_socket_disconnecting()
+
+
+
+func get_device(index: int) -> BPIODevice:
+    return _devices.get(index, null)
 
 
 
@@ -68,7 +75,7 @@ func start_scanning_for_devices() -> void:
         push_error("[BPIO] Trying to send a message on a disconnected client.")
         return
     
-    _queue_message(BPIOMessage.MessageStartScanning.new())
+    _queue_message(_BPIOMessage.MessageStartScanning.new())
     scanning_started.emit()
 
 func stop_scanning_for_devices() -> void:
@@ -76,14 +83,14 @@ func stop_scanning_for_devices() -> void:
         push_error("[BPIO] Trying to send a message on a disconnected client.")
         return
     
-    _queue_message(BPIOMessage.MessageStopScanning.new())
+    _queue_message(_BPIOMessage.MessageStopScanning.new())
 
 func list_devices() -> Array[BPIODevice]:
     if not is_client_connected():
         push_error("[BPIO] Trying to send a message on a disconnected client.")
         return []
     
-    var msg := await _queue_message_and_await(BPIOMessage.MessageRequestDeviceList.new())
+    var msg := await _queue_message_and_await(_BPIOMessage.MessageRequestDeviceList.new())
 
     var arr: Array[BPIODevice] = []
 
@@ -108,7 +115,7 @@ func stop_all_devices() -> void:
         push_error("[BPIO] Trying to send a message on a disconnected client.")
         return
     
-    _queue_message(BPIOMessage.MessageStopAllDevices.new())
+    _queue_message(_BPIOMessage.MessageStopAllDevices.new())
 
 
 
@@ -147,25 +154,25 @@ func _on_socket_server_info_received(_m) -> void:
     connected.emit()
     set_process(true)
 
-func _on_socket_device_added_received(msg: BPIOMessage.MessageDeviceAdded) -> void:
+func _on_socket_device_added_received(msg: _BPIOMessage.MessageDeviceAdded) -> void:
     var dev := _create_device(msg)
-    _devices[dev.id] = dev
+    _devices[dev.device_index] = dev
     device_connected.emit(dev)
 
-func _on_socket_device_removed_received(msg: BPIOMessage.MessageDeviceRemoved) -> void:
+func _on_socket_device_removed_received(msg: _BPIOMessage.MessageDeviceRemoved) -> void:
     if not _devices.has(msg.index):
         return
     
     var dev := _devices[msg.index] as BPIODevice
     _devices.erase(msg.index)
 
-    dev._device_index = -1
     device_disconnected.emit(dev)
+    dev._device_index = -1
 
-func _on_socket_scanning_finished(_msg: BPIOMessage.MessageScanningFinished) -> void:
+func _on_socket_scanning_finished(_msg: _BPIOMessage.MessageScanningFinished) -> void:
     scanning_finished.emit()
 
-func _on_socket_sensor_reading_received(msg: BPIOMessage.MessageSensorReading) -> void:
+func _on_socket_sensor_reading_received(msg: _BPIOMessage.MessageSensorReading) -> void:
     if not _devices.has(msg.device_index):
         return
     
@@ -175,31 +182,31 @@ func _on_socket_sensor_reading_received(msg: BPIOMessage.MessageSensorReading) -
 
 
 
-func _queue_message(msg: BPIOMessage.OutboundMessage) -> void:
+func _queue_message(msg: _BPIOMessage.OutboundMessage) -> void:
     _message_queue.push_back(msg)
 
-func _queue_messages(msgs: Array[BPIOMessage.OutboundMessage]) -> void:
+func _queue_messages(msgs: Array[_BPIOMessage.OutboundMessage]) -> void:
     for msg in msgs:
         _queue_message(msg)
 
-func _queue_message_with_id(msg: BPIOMessage.OutboundMessage) -> int:
+func _queue_message_with_id(msg: _BPIOMessage.OutboundMessage) -> int:
     var id := _socket.increment_next_message_id()
     msg.id = id
     _queue_message(msg)
     return id
 
-func _queue_message_and_await(msg: BPIOMessage.OutboundMessage) -> BPIOMessage.InboundMessage:
+func _queue_message_and_await(msg: _BPIOMessage.OutboundMessage) -> _BPIOMessage.InboundMessage:
     var id := _queue_message_with_id(msg)
     return await _await_msg(id, msg.get_message_name())
 
 
 
-func _await_msg(id: int, msgname: String) -> BPIOMessage.InboundMessage:
+func _await_msg(id: int, msgname: String) -> _BPIOMessage.InboundMessage:
     while true:
-        var msg: BPIOMessage.InboundMessage = await _socket.message_received
+        var msg: _BPIOMessage.InboundMessage = await _socket.message_received
 
         if msg.id == id:
-            if msg is BPIOMessage.MessageError:
+            if msg is _BPIOMessage.MessageError:
                 push_error("[BPIO] Error received after sending a ", msgname, " message (ID ", id, "): ", msg.error_message, " (", msg.error_code, ")")
                 break
             
