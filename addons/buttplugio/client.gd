@@ -1,54 +1,62 @@
-## Client for Buttplug.IO. Internally uses [BPIOConnection].
+## Client for Buttplug.IO. Internally uses [BPIOConnection] and manages 
+## the connected devices as [BPIODevice].
 ##
 class_name BPIOClient extends Node
 
 const _BPIOMessage = preload("res://addons/buttplugio/protocol/message.gd")
 
 
-
+## The client has connected to a server.
 signal connected()
+## The client failed to connect to a server.
 signal connection_failed(why: String)
+## The client has disconnected from a server.
 signal disconnected()
 
+## A new device has been connected to the server.
 signal device_connected(device: BPIODevice)
+## A device has been disconnected from a server.
 signal device_disconnected(device: BPIODevice)
+## Device scanning has been started on the server.
 signal scanning_started()
+## Device scanning has finished on the server.
 signal scanning_finished()
+## Sensor [param data] have been received for the [param device], regarding the
+## sensor at index [param sensor].
 signal sensor_data_received(device: BPIODevice, sensor: int, data: Array[int])
 
 
-
+## Name of the client, reported to the server.
 @export var client_name := "Godot.SEX"
+## URL to connect to.
 @export var server_url := "ws://127.0.0.1:12345"
 
 
-
-var _socket := BPIOConnection.new()
-
-var _devices: Dictionary = {}
-var _message_queue: Array[_BPIOMessage.OutboundMessage] = []
-
-
-
+## Checks if the client is connecting.
 func is_client_connecting() -> bool:
     return _socket.is_socket_connecting()
 
+## Checks if the client is fully connected.
 func is_client_connected() -> bool:
     return _socket.is_socket_connected()
 
+## Checks if the client is fully disconnected.
 func is_client_disconnected() -> bool:
     return _socket.is_socket_disconnected()
 
+## Checks if the client is disconnecting.
 func is_client_disconnecting() -> bool:
     return _socket.is_socket_disconnecting()
 
 
-
+## Retreives the device with the index [param index].
 func get_device(index: int) -> BPIODevice:
     return _devices.get(index, null)
 
 
-
+## Connects the client to the server at the URL [param url]. If
+## no URL are provided, the URL in [field server_url] is used 
+## instead.
 func connect_to_server(url: String = "") -> void:
     if not is_client_disconnected():
         push_error("[BPIO] Trying to connect a client not disconnected.")
@@ -61,6 +69,7 @@ func connect_to_server(url: String = "") -> void:
     if _socket.connect_socket(server_url):
         set_process(true)
 
+## Disconnects the client from the server.
 func disconnect_from_server() -> void:
     if not is_client_connected():
         push_error("[BPIO] Trying to disconnect a client not connected.")
@@ -70,6 +79,7 @@ func disconnect_from_server() -> void:
 
 
 
+## Requests the server to start scanning for devices.
 func start_scanning_for_devices() -> void:
     if not is_client_connected():
         push_error("[BPIO] Trying to send a message on a disconnected client.")
@@ -78,6 +88,7 @@ func start_scanning_for_devices() -> void:
     _queue_message(_BPIOMessage.MessageStartScanning.new())
     scanning_started.emit()
 
+## Requests the server to stop scanning for devices.
 func stop_scanning_for_devices() -> void:
     if not is_client_connected():
         push_error("[BPIO] Trying to send a message on a disconnected client.")
@@ -85,6 +96,9 @@ func stop_scanning_for_devices() -> void:
     
     _queue_message(_BPIOMessage.MessageStopScanning.new())
 
+## Requests the server to return a list of currently connected devices.
+## The list is returned asynchroniously when the client receives the
+## information.
 func list_devices() -> Array[BPIODevice]:
     if not is_client_connected():
         push_error("[BPIO] Trying to send a message on a disconnected client.")
@@ -110,12 +124,20 @@ func list_devices() -> Array[BPIODevice]:
 
     return arr
 
+## Requests the server to stop all actuators on all devices.
 func stop_all_devices() -> void:
     if not is_client_connected():
         push_error("[BPIO] Trying to send a message on a disconnected client.")
         return
     
     _queue_message(_BPIOMessage.MessageStopAllDevices.new())
+
+
+
+var _socket := BPIOConnection.new()
+
+var _devices: Dictionary = {}
+var _message_queue: Array[_BPIOMessage.OutboundMessage] = []
 
 
 
@@ -167,6 +189,7 @@ func _on_socket_device_removed_received(msg: _BPIOMessage.MessageDeviceRemoved) 
     _devices.erase(msg.index)
 
     device_disconnected.emit(dev)
+    dev.disconnected.emit()
     dev._device_index = -1
 
 func _on_socket_scanning_finished(_msg: _BPIOMessage.MessageScanningFinished) -> void:

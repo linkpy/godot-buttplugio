@@ -1,71 +1,101 @@
-## Buttplug.IO connection to a server. Shouldnt be used directly (unless you 
-## know what you are doing).
+## WebSocket wrapper, handling the connection and message encoding/decoding 
+## for a Buttplug.IO compatible server.
+##
+## This class implement support for the Buttplug Intimate Device Control 
+## Standard, version 3. For more information about the underlying protocol,
+## please see the [url=https://buttplug-spec.docs.buttplug.io/docs/spec/]specifications[/url].
+## [br][br]
+## [b]Note[/b]: It is recommanded to use the [BPIOClient] class, which is a 
+## higher-level API around the Buttplug.IO protocol. 
 ##
 class_name BPIOConnection extends RefCounted
+
 
 ## Protocol version of the connection.
 const MESSAGE_VERSION := 3
 
 const _Messages = preload("res://addons/buttplugio/protocol/message.gd")
 
+
+## A connection to the WebSocket server [param url] have been requested to the 
+## socket.
 signal connection_requested(url: String)
+## A disconnection from the server have been requested to the socket.
 signal disconnected_requested()
+## The connection was established to a server. [br][br]
+##
+## [b]Note[/b]: This signal is emitted *before* having received server metadata.
+## If server information is necessary, you should wait on 
+## [signal message_server_info_received] after a conneciton 
+## has been established.
+##
 signal connected()
+## The connection is now fully closed. 
 signal disconnected()
+## The connection attempt to a server failed, because of the [param code] and
+## [param reason]. Both of these are the underlying WebSocket's close code and
+## reason. For more information, see [method WebSocketPeer.close]. [br][br]
+## 
+## [b]Note[/b]: [param code] and [param reason] can also be from [enum Error] if Godot
+## failed to initiate the connection to the server.
 signal connection_failed(code: int, reason: String)
 
+
+## A message have been received from the server.
 signal message_received(msg: _Messages.InboundMessage)
+## An "Ok" message have been received from the server.
 signal message_ok_received(msg: _Messages.MessageOk)
+## An "Error" message have been received from the server.
 signal message_error_received(msg: _Messages.MessageError)
+## A "ServerInfo" message have been received from the server.
 signal message_server_info_received(msg: _Messages.MessageServerInfo)
+## A "ScanningFinished" message have been received from the server.
 signal message_scanning_finished_received(msg: _Messages.MessageScanningFinished)
+## A "DeviceList" message have been received from the server.
 signal message_device_list_received(msg: _Messages.MessageDeviceList)
+## A "DeviceAdded" message have been received from the server. 
 signal message_device_added_received(msg: _Messages.MessageDeviceAdded)
+## A "DeviceRemoved" message have been received from the server.
 signal message_device_removed_received(msg: _Messages.MessageDeviceRemoved)
+## A "SensorReading" message have been received from the server.
 signal message_sensor_reading_received(msg: _Messages.MessageSensorReading)
 
 
-
+## Name of the client to report to the server during handshake.
 var client_name: String = "Godot.SEX"
 
 
-
-var _ws: WebSocketPeer = WebSocketPeer.new()
-var _ws_last_state: int = 0
-
-var _msg_id: int = 1
-
-var _last_ping_time: int = 0
-var _max_ping_time: int = 0
-
-var _server_name: String = ""
-var _message_version: int = 0
-
-
-
+## Checks if the socket is connecting to a server.
 func is_socket_connecting() -> bool:
     return _ws.get_ready_state() == WebSocketPeer.STATE_CONNECTING
 
+## Checks if the socket is connected to a server.
 func is_socket_connected() -> bool:
     return _ws.get_ready_state() == WebSocketPeer.STATE_OPEN
 
+## Checks if the server is disconnected from a server.
 func is_socket_disconnected() -> bool:
     return _ws.get_ready_state() == WebSocketPeer.STATE_CLOSED
 
+## Checks if the server is disconnecting from a server.
 func is_socket_disconnecting() -> bool:
     return _ws.get_ready_state() == WebSocketPeer.STATE_CLOSING
 
 
 
+## Gets the ID of the next outgoing message.
 func get_next_message_id() -> int:
     return _msg_id
 
+## Increments the ID of the next outgoing message. 
+## Returns the previous ID.
 func increment_next_message_id() -> int:
     _msg_id += 1
     return _msg_id - 1
 
 
-
+## Connects the socket to the server [param url]. Returns [code]true[/code]
+## if the connection was succesfully initiated.
 func connect_socket(url: String) -> bool:
     if not is_socket_disconnected():
         push_error("[BPIO] Trying to connect to an already connected socket.")
@@ -86,6 +116,7 @@ func connect_socket(url: String) -> bool:
 
     return true
 
+## Disconnects the socket from the currently connected server.
 func disconnect_socket() -> void:
     if not is_socket_connected():
         push_error("[BPIO] Trying to disconnected a non-connected socket.")
@@ -98,6 +129,8 @@ func disconnect_socket() -> void:
 
 
 
+## Updates the socket state. Should be call frequently (ie [method Node._process]), unless
+## the socket is fully disconnected (see [method is_socket_disconnected]).
 func update_state() -> void:
     var curr := _ws.get_ready_state()
     var last := _ws_last_state
@@ -144,6 +177,10 @@ func update_state() -> void:
                 WebSocketPeer.STATE_CLOSING:
                     print("[BPIO] Weird state: CLOSED -> CLOSING")
 
+## Polls packets from the socket and parse them into messages, 
+## dispatching them through [signal message_received] and associated
+## signals. Should be called frequently (ie [method Node._process]) 
+## when the socket is open (see [method is_socket_connected]).
 func poll() -> void:
     if not is_socket_connected():
         push_error("[BPIO] Trying to poll a non-connected BPIO connection.")
@@ -155,10 +192,11 @@ func poll() -> void:
     _send_ping_if_necessary()
 
 
-
+## Sends the message [param msg] immediately.
 func send_message(msg: _Messages.OutboundMessage) -> void:
     send_messages([msg])
 
+## Sends the messages [param msgs] immediately.
 func send_messages(msgs: Array[_Messages.OutboundMessage]) -> void:
     for msg in msgs:
         if msg.id == 0:
@@ -170,6 +208,20 @@ func send_messages(msgs: Array[_Messages.OutboundMessage]) -> void:
     var as_dicts = msgs.map(func(x): return x.to_dict())
     var json := JSON.stringify(as_dicts)
     _ws.send_text(json)
+
+
+
+
+var _ws: WebSocketPeer = WebSocketPeer.new()
+var _ws_last_state: int = 0
+
+var _msg_id: int = 1
+
+var _last_ping_time: int = 0
+var _max_ping_time: int = 0
+
+var _server_name: String = ""
+var _message_version: int = 0
 
 
 

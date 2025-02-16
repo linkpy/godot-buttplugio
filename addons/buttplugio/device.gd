@@ -6,23 +6,30 @@ class_name BPIODevice extends RefCounted
 const _BPIOMessage = preload("res://addons/buttplugio/protocol/message.gd")
 
 
+## The device has been disconnected.
+signal disconnected()
 
+
+## Name of the device.
 var name: String:
 	get: return _name
 
+## Display name of the device.
 var display_name: String:
 	get: return _display_name
 
+## Device index (server-side) of the device.
 var device_index: int:
 	get: return _device_index
 
 
-
+## Checks if the device is still valid. Should be called
+## before any operations on the device to avoid errors.
 func is_device_connected() -> bool:
 	return _device_index >= 0
 
 
-
+## Gets the number of vibrator (scalar actuators) the device has.
 func get_vibrator_count() -> int:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -33,6 +40,8 @@ func get_vibrator_count() -> int:
 	else:
 		return 0
 
+## Gets the feature descriptor of the vibrator at index [param idx]. 
+## See [method get_vibrator_count].
 func get_vibrator_descriptor(idx: int) -> String:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -50,6 +59,8 @@ func get_vibrator_descriptor(idx: int) -> String:
 	
 	return features[idx].feature_descriptor
 
+## Gets the step count (levels of quantitizaing) of the strength of the 
+## vibrator at index [param idx]. See [method get_vibrator_count].
 func get_vibrator_step_count(idx: int) -> int:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -67,6 +78,8 @@ func get_vibrator_step_count(idx: int) -> int:
 	
 	return features[idx].step_count
 
+## Gets the type of the vibrator at index [param idx]. 
+## See [method get_vibrator_count].
 func get_vibrator_type(idx: int) -> String:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -85,7 +98,7 @@ func get_vibrator_type(idx: int) -> String:
 	return features[idx].actuator_type
 
 
-
+## Gets the number of translator (linear actuators) the device has.
 func get_translator_count() -> int:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -95,6 +108,8 @@ func get_translator_count() -> int:
 	else:
 		return 0
 
+## Gets the feature descriptor of the translator at index [param idx]. 
+## See [method get_translator_count].
 func get_translator_descriptor(idx: int) -> String:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -112,6 +127,8 @@ func get_translator_descriptor(idx: int) -> String:
 	
 	return features[idx].feature_descriptor
 
+## Gets the step count (levels of quantitizaing) of the position of the 
+## translator at index [param idx]. See [method get_translator_count].
 func get_translator_step_count(idx: int) -> int:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -129,6 +146,8 @@ func get_translator_step_count(idx: int) -> int:
 	
 	return features[idx].step_count
 
+## Gets the type of the translator at index [param idx]. 
+## See [method get_translator_count].
 func get_translator_type(idx: int) -> String:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -147,7 +166,7 @@ func get_translator_type(idx: int) -> String:
 	return features[idx].actuator_type
 
 
-
+## Gets the number of rotator (rotation actuators) the device has.
 func get_rotator_count() -> int:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -158,6 +177,8 @@ func get_rotator_count() -> int:
 	else:
 		return 0
 
+## Gets the feature descriptor of the rotator at index [param idx]. 
+## See [method get_rotator_count].
 func get_rotator_descriptor(idx: int) -> String:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -175,6 +196,8 @@ func get_rotator_descriptor(idx: int) -> String:
 	
 	return features[idx].feature_descriptor
 
+## Gets the step count (levels of quantitizaing) of the speed of the 
+## rotator at index [param idx]. See [method get_rotator_count].
 func get_rotator_step_count(idx: int) -> int:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -192,6 +215,8 @@ func get_rotator_step_count(idx: int) -> int:
 	
 	return features[idx].step_count
 
+## Gets the type of the rotator at index [param idx]. 
+## See [method get_rotator_count].
 func get_rotator_type(idx: int) -> String:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -210,7 +235,7 @@ func get_rotator_type(idx: int) -> String:
 	return features[idx].actuator_type
 
 
-
+## Gets the number of sensor the device has.
 func get_sensor_count() -> int:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -221,6 +246,8 @@ func get_sensor_count() -> int:
 	else:
 		return 0
 	
+## Gets the feature descriptor of the sensor at index [param idx]. 
+## See [method get_sensor_count].
 func get_sensor_descriptor(idx: int) -> String:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -238,6 +265,8 @@ func get_sensor_descriptor(idx: int) -> String:
 	
 	return features[idx].feature_descriptor
 
+## Gets the type of the sensor at index [param idx]. 
+## See [method get_sensor_count].
 func get_sensor_type(idx: int) -> String:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -255,6 +284,10 @@ func get_sensor_type(idx: int) -> String:
 	
 	return features[idx].sensor_type
 
+## Gets the range of the data returned by the sensor at index [param idx].
+## This returns an array of array of integers : [code][[0,100],[50,200]][/code] 
+## represents the range of the sensor returning 2 data entry, with a minimum and
+## maximum for each entry. See [method get_sensor_count].
 func get_sensor_range(idx: int) -> Array:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -273,7 +306,8 @@ func get_sensor_range(idx: int) -> Array:
 	return features[idx].sensor_range
 
 
-
+## Checks if the device has cached sensor data for the sensor at index 
+## [param sensor]. See [method get_sensor_count].
 func has_sensor_data(sensor: int) -> bool:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -281,6 +315,10 @@ func has_sensor_data(sensor: int) -> bool:
 	
 	return _sensor_data.has(sensor)
 
+## Retreives the cached data the device has for the sensor at index
+## [param sensor]. If the device has no cached data, an empty array is
+## returned. The array returned has N element, each within the ranges
+## returned by [method get_sensor_range]. See [method get_sensor_count].
 func get_sensor_data(sensor: int) -> Array[int]:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -289,7 +327,7 @@ func get_sensor_data(sensor: int) -> Array[int]:
 	return _sensor_data.get(sensor, [])
 
 
-
+## Stops all actuators on the device.
 func stop() -> void:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -303,6 +341,11 @@ func stop() -> void:
 	msg.index = _device_index
 	_queue_message(msg)
 
+## Vibrates the vibrator at index [param vibrator] for a strength of [param value].
+## [param value] should be within 0.0 (full stop) and 1.0 (full strength). [br][br]
+##
+## [b]Note[/b]: If [param vibrator] is set to -1, all vibrators on the device will be
+## vibrated to the same strength.
 func vibrate(vibrator: int, value: float) -> void:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -338,6 +381,12 @@ func vibrate(vibrator: int, value: float) -> void:
 		scalar.actuator_type = features[vibrator].actuator_type
 		_message_scalar.scalars.push_back(scalar)
 
+## Translates the translator at index [param translator] to the position [position],
+## going from 0.0 (minimum position) to 1.0 (maximum position), in [param duration] seconds.
+## [br][br]
+##
+## [b]Note[/b]: If [param translator] is set to -1, all translators on the device will be
+## translator to the same position over the same duration.
 func translate(translator: int, duration: float, position: float) -> void:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -374,6 +423,12 @@ func translate(translator: int, duration: float, position: float) -> void:
 		vector.position = position
 		_message_linear.vectors.push_back(vector)
 
+## Rotates the rotator at index [param rotator] at the speed [param speed], value from
+## 0.0 (full stop) to 1.0 (maximum speed), in the direction described by [param clockwise].
+## [br][br]
+##
+## [b]Note[/b]: If [param rotator] is set to -1, all rotators on the device will be
+## rotated at the same speed in the same direction.
 func rotate(rotator: int, speed: float, clockwise: bool) -> void:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
@@ -410,6 +465,9 @@ func rotate(rotator: int, speed: float, clockwise: bool) -> void:
 		rotation.clockwise = clockwise
 		_message_rotate.rotations.push_back(rotation)
 
+## Reads the value of the sensor at the index [param sensor]. Returns 
+## asynchroniously the readed data. The data received will also be
+## cached, to be retreived using [method get_sensor_data].
 func read_sensor(sensor: int) -> Array:
 	if not is_device_connected():
 		push_error("[BPIO] Trying to use a disconnected device.")
