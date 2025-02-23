@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bxl6qxwhms6ym"]
 
-[ext_resource type="Script" path="res://panels/device_list.gd" id="1_gotx4"]
+[ext_resource type="Script" uid="uid://cyabb310rrg46" path="res://panels/device_list.gd" id="1_gotx4"]
 
 [node name="device_list" type="VBoxContainer"]
 anchors_preset = 15

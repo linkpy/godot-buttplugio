@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bbht2wpkf3tdv"]
 
-[ext_resource type="Script" path="res://panels/feature_entry.gd" id="1_3warc"]
+[ext_resource type="Script" uid="uid://bfojy0gt3i7xf" path="res://panels/feature_entry.gd" id="1_3warc"]
 
 [node name="feature_entry" type="MarginContainer"]
 anchors_preset = 15

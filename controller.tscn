@@ -2,8 +2,8 @@
 
 [ext_resource type="PackedScene" uid="uid://b332iq48kll48" path="res://panels/connection.tscn" id="1_4b6xj"]
 [ext_resource type="PackedScene" uid="uid://bxl6qxwhms6ym" path="res://panels/device_list.tscn" id="1_ngacf"]
-[ext_resource type="Script" path="res://controller.gd" id="1_vtwsa"]
-[ext_resource type="Script" path="res://addons/buttplugio/client.gd" id="2_n7541"]
+[ext_resource type="Script" uid="uid://bggbxsayilkkv" path="res://controller.gd" id="1_vtwsa"]
+[ext_resource type="Script" uid="uid://c8gxfc612x64b" path="res://addons/buttplugio/client.gd" id="2_n7541"]
 [ext_resource type="PackedScene" uid="uid://jf1vfbt24kkk" path="res://panels/device_info.tscn" id="2_oiqb8"]
 
 [node name="controller" type="MarginContainer"]

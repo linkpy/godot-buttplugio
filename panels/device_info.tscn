@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://jf1vfbt24kkk"]
 
 [ext_resource type="PackedScene" uid="uid://orpiati8bhv" path="res://panels/device_metadata.tscn" id="1_5eh4g"]
-[ext_resource type="Script" path="res://panels/device_info.gd" id="1_m8ems"]
+[ext_resource type="Script" uid="uid://cx5tc58nk1jao" path="res://panels/device_info.gd" id="1_m8ems"]
 [ext_resource type="PackedScene" uid="uid://m4qytscnkdqu" path="res://panels/features.tscn" id="2_yja1m"]
 
 [node name="device_info" type="ScrollContainer"]

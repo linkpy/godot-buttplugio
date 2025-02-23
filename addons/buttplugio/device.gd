@@ -9,6 +9,10 @@ const _BPIOMessage = preload("res://addons/buttplugio/protocol/message.gd")
 ## The device has been disconnected.
 signal disconnected()
 
+## The client received some [param data] about the sensor at index [sensor].
+## See [method get_sensor_data] and [method get_sensor_range].
+signal sensor_data_received(sensor: int, data: Array)
+
 
 ## Name of the device.
 var name: String:
